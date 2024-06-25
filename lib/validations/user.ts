@@ -13,6 +13,6 @@ export const UserValidation = z.object({
     .max(30, { message: "MAXIMUM 30 CHARACTERS" }),
   bio: z
     .string()
-    .min(10, { message: "MINIMUM 10 CHARACTERS" })
-    .max(1000, { message: "MAXIMUM 30 CHARACTERS" }),
+    .min(3, { message: "MINIMUM 3 CHARACTERS" })
+    .max(1000, { message: "MAXIMUM 1000 CHARACTERS" }),
 });
