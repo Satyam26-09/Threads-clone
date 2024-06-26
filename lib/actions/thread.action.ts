@@ -59,7 +59,7 @@ export async function fetchThreads(pageNumber = 1, pageSize = 20) {
         populate: {
           //learn & understand
           path: "author",
-          model: "User",
+          model: User,
           select: "_id name parentId image",
         },
       });
@@ -86,7 +86,7 @@ export async function fetchThreadById(id: string) {
     const thread = await Thread.findById(id) //learn
       .populate({
         path: "author",
-        model: "User",
+        model: User,
         select: "_id id name image",
       })
       .populate({
@@ -94,15 +94,15 @@ export async function fetchThreadById(id: string) {
         populate: [
           {
             path: "author",
-            model: "User",
+            model: User,
             select: "_id ParentId name image",
           },
           {
             path: "children",
-            model: "Thread",
+            model: Thread,
             populate: {
               path: "author",
-              model: "User",
+              model: User,
               select: "_id id ParentId name image",
             },
           },
