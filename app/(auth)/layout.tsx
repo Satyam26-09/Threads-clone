@@ -8,6 +8,7 @@ import {
 import { Inter } from "next/font/google";
 
 import "../globals.css";
+import { dark } from "@clerk/themes";
 
 export const metadata = {
   title: "Threads",
@@ -17,33 +18,19 @@ export const metadata = {
 
 const inter = Inter({ subsets: ["latin"] });
 
-function Header() {
-  return (
-    <header
-      style={{ display: "flex", justifyContent: "space-between", padding: 20 }}
-    >
-      <SignedIn>
-        {/* Mount the UserButton component */}
-        <UserButton />
-      </SignedIn>
-      <SignedOut>
-        {/* Signed out users get sign in button */}
-        <SignInButton />
-      </SignedOut>
-    </header>
-  );
-}
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+      }}
+    >
       <html lang="en">
         <body className={`${inter.className} bg-dark-1`}>
-          <Header />
           <div className="w-full flex justify-center items-center">
             {children}
           </div>
