@@ -1,10 +1,12 @@
+"use client";
+
 import { formatDateString } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import SharePopup from "../shared/SharePopup";
 
 interface Props {
-  key: string;
   id: string;
   currentUserId: string;
   parentId: string | null;
@@ -27,7 +29,6 @@ interface Props {
 }
 
 const ThreadCard = ({
-  key,
   id,
   currentUserId,
   parentId,
@@ -38,6 +39,15 @@ const ThreadCard = ({
   comments,
   isComment,
 }: Props) => {
+  const [likes, setLikes] = useState(0);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const handleShareClick = () => {
+    setIsPopupOpen((prev) => !prev);
+  };
+
+  const threadLink = `http://localhost:3000/thread/${id}`;
+
   return (
     <article
       className={`flex w-full flex-col rounded-xl ${
@@ -66,14 +76,19 @@ const ThreadCard = ({
             <p className="mt-2 px-2 text-small-regular text-light-2">
               {content}
             </p>
-            <div className={`${isComment && "mb-10"} mt-5 flex flex-col gap-3`}>
-              <div className="flex gap-3 5">
+            <div
+              className={`${
+                isComment && "mb-10"
+              } mt-5 flex flex-col gap-3 mb-0`}
+            >
+              <div className="flex gap-3 relative">
                 <Image
                   src="/assets/heart-gray.svg"
                   alt="heart"
                   width={24}
                   height={24}
                   className="cursor-pointer object-contain"
+                  onClick={() => setLikes(likes + 1)}
                 />
                 <Link href={`/thread/${id}`}>
                   <Image
@@ -91,17 +106,25 @@ const ThreadCard = ({
                   height={24}
                   className="cursor-pointer object-contain"
                 />
-                <Image
-                  src="/assets/share.svg"
-                  alt="share"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer object-contain"
-                />
+                <button onClick={handleShareClick}>
+                  <Image
+                    src="/assets/share.svg"
+                    alt="share"
+                    width={24}
+                    height={24}
+                    className="cursor-pointer object-contain"
+                  />
+                </button>
+                {isPopupOpen && (
+                  <SharePopup
+                    threadLink={threadLink}
+                    onClose={handleShareClick}
+                  />
+                )}
               </div>
               {isComment && comments.length > 0 && (
                 <Link href={`thread/${id}`}>
-                  <p className="mt-1 text-subtle-medium text-gray-1">
+                  <p className="text-subtle-medium text-gray-1">
                     {comments.length} replies
                   </p>
                 </Link>
@@ -112,24 +135,28 @@ const ThreadCard = ({
         {/* delete thread */}
         {/* show comment logos */}
       </div>
-      {!isComment && community && (
-        <Link
-          href={`/communities/${community.id}`}
-          className="mt-5 flex items-center"
-        >
-          <p className="text-subtle-medium text-gray-1">
-            {formatDateString(createdAt)} <span className="p-3"></span>{" "}
-            {community.name} Community
-          </p>
-          <Image
-            src={community.image}
-            alt={community.name}
-            width={14}
-            height={14}
-            className="ml-1 rounded-full object-cover"
-          />
-        </Link>
-      )}
+      <div className=" flex items-center">
+        <span className="p-3 text-subtle-medium text-gray-1">
+          {formatDateString(createdAt)}
+        </span>
+        {!isComment && community && (
+          <Link
+            href={`/communities/${community.id}`}
+            className="flex items-center"
+          >
+            <span className="pl-5 text-subtle-medium text-gray-1">
+              {community.name} Community
+            </span>
+            <Image
+              src={community.image}
+              alt={community.name}
+              width={14}
+              height={14}
+              className="ml-1 rounded-full object-cover"
+            />
+          </Link>
+        )}
+      </div>
     </article>
   );
 };

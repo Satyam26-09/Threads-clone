@@ -67,7 +67,7 @@ const page = async ({ params }: { params: { id: string } }) => {
               ))}
             </section>
           </TabsContent>
-          <TabsContent value="threads" className="w-full text-light-1">
+          <TabsContent value="requests" className="w-full text-light-1">
             {/* <ThreadsTab
               currentUserId={user.id}
               accountId={communityDetails._id}

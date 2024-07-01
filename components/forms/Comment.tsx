@@ -41,7 +41,7 @@ const Comment = ({ threadId, currentUserImage, currentUserId }: Props) => {
     await addCommentToThread(
       threadId,
       values.thread,
-      JSON.parse(currentUserId), //learn
+      currentUserId, //learn previously it was JSON.parse(currentUserId) when ThreadCard.tsx was not using "use client"
       pathname
     );
 

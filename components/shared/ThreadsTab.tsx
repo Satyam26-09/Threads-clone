@@ -31,7 +31,11 @@ const ThreadsTab = async ({ currentUserId, accountId, accountType }: Props) => {
           content={thread.text}
           author={
             accountType === "User" //learn why
-              ? { name: result.name, image: result.image, id: result.id }
+              ? {
+                  name: result.name,
+                  image: result.image,
+                  id: result.id,
+                }
               : {
                   name: thread.author.name,
                   image: thread.author.image,
@@ -40,11 +44,17 @@ const ThreadsTab = async ({ currentUserId, accountId, accountType }: Props) => {
           }
           community={
             accountType === "Community" //learn why
-              ? { name: result.name, id: result.id, image: result.image }
+              ? {
+                  name: result.name,
+                  image: result.image,
+                  id: result.id,
+                }
               : thread.community
           }
           createdAt={thread.createdAt}
-          comments={thread.children}
+          comments={thread.children.map((comment: { image: string }) => ({
+            image: comment.image,
+          }))}
         />
       ))}
     </section>
