@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FaFacebook,
   FaTwitter,
@@ -13,9 +13,13 @@ interface Props {
 }
 
 const SharePopup = ({ threadLink, onClose }: Props) => {
+  const [showNotification, setShowNotification] = useState(false);
   const handleCopyLink = () => {
     navigator.clipboard.writeText(threadLink);
-    alert("Link copied to clipboard!");
+    setShowNotification(true);
+    setTimeout(() => {
+      setShowNotification(false);
+    }, 3000);
   };
 
   return (
@@ -52,6 +56,9 @@ const SharePopup = ({ threadLink, onClose }: Props) => {
           </button>
         </div>
       </div>
+      {showNotification && (
+        <div className="notification">Link copied to clipboard!</div>
+      )}
     </div>
   );
 };

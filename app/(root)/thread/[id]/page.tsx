@@ -21,29 +21,35 @@ const page = async ({ params }: { params: { id: string } }) => {
 
   // Function to recursively serialize comments
   const serializeComments = (comments: any[]): any[] => {
-    return comments.map((comment) => ({
-      id: comment._id.toString(),
-      currentUserId: user.id || "",
-      parentId: comment.parentId ? comment.parentId.toString() : null,
-      content: comment.text,
-      author: {
-        name: comment.author.name,
-        image: comment.author.image,
-        id: comment.author.id.toString(),
-      },
-      community: thread.community
-        ? {
-            name: thread.community.name,
-            image: thread.community.image,
-            id: thread.community.id.toString(),
-          }
-        : null,
-      createdAt: comment.createdAt.toString(),
-      comments: comment.children ? serializeComments(comment.children) : [], // Recursively handle nested comments
-    }));
+    return comments.map((comment) => {
+      const hasLiked = userInfo?.likedThreads?.includes(comment._id);
+      return {
+        id: comment._id.toString(),
+        currentUserId: user.id || "",
+        parentId: comment.parentId ? comment.parentId.toString() : null,
+        content: comment.text,
+        author: {
+          name: comment.author.name,
+          image: comment.author.image,
+          id: comment.author.id.toString(),
+        },
+        community: thread.community
+          ? {
+              name: thread.community.name,
+              image: thread.community.image,
+              id: thread.community.id.toString(),
+            }
+          : null,
+        createdAt: comment.createdAt.toString(),
+        likes: comment.likes,
+        hasLiked: hasLiked || false,
+        comments: comment.children ? serializeComments(comment.children) : [], // Recursively handle nested comments
+      };
+    });
   };
 
   // Serialize thread and children for safe passing to components
+  const hasLiked = userInfo?.likedThreads?.includes(thread._id);
   const serializedThread = {
     id: thread._id.toString(),
     currentUserId: user.id || "",
@@ -63,6 +69,8 @@ const page = async ({ params }: { params: { id: string } }) => {
       : null,
     createdAt: thread.createdAt.toString(),
     comments: serializeComments(thread.children),
+    likes: thread.likes,
+    hasLiked: hasLiked || false,
   };
 
   return (

@@ -9,7 +9,7 @@ import Thread from "../models/thread.model";
 import Community from "../models/community.model";
 
 export async function fetchThreads(pageNumber = 1, pageSize = 20) {
-  connectToDB();
+  await connectToDB();
 
   // Calculate the number of posts to skip based on the page number and page size.
   const skipAmount = (pageNumber - 1) * pageSize;
@@ -53,6 +53,7 @@ interface Params {
   author: string;
   communityId: string | null;
   path: string;
+  likes: number;
 }
 
 export async function createThread({
@@ -60,9 +61,10 @@ export async function createThread({
   author,
   communityId,
   path,
+  likes,
 }: Params) {
   try {
-    connectToDB();
+    await connectToDB();
 
     const communityIdObject = await Community.findOne(
       { id: communityId },
@@ -73,6 +75,7 @@ export async function createThread({
       text,
       author,
       community: communityIdObject, // Assign communityId if provided, or leave it null for personal account
+      likes,
     });
 
     // Update User model
@@ -107,7 +110,7 @@ async function fetchAllChildThreads(threadId: string): Promise<any[]> {
 
 export async function deleteThread(id: string, path: string): Promise<void> {
   try {
-    connectToDB();
+    await connectToDB();
 
     // Find the thread to be deleted (the main thread)
     const mainThread = await Thread.findById(id).populate("author community");
@@ -162,7 +165,7 @@ export async function deleteThread(id: string, path: string): Promise<void> {
 }
 
 export async function fetchThreadById(threadId: string) {
-  connectToDB();
+  await connectToDB();
 
   try {
     const thread = await Thread.findById(threadId)
@@ -210,7 +213,7 @@ export async function addCommentToThread(
   userId: string,
   path: string
 ) {
-  connectToDB();
+  await connectToDB();
 
   try {
     // Find the original thread by its ID
@@ -240,5 +243,46 @@ export async function addCommentToThread(
   } catch (err) {
     console.error("Error while adding comment:", err);
     throw new Error("Unable to add comment");
+  }
+}
+
+export async function updateLike(threadId: string, userId: string) {
+  await connectToDB();
+
+  try {
+    // Find the original thread by its ID
+    const originalThread = await Thread.findById(threadId);
+
+    if (!originalThread) {
+      throw new Error("Thread not found");
+    }
+
+    // Find the user by ID
+    const user = await User.findOne({ id: userId });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if the user has already liked the thread
+    const hasLiked = user.likedThreads.includes(threadId);
+
+    if (!hasLiked) {
+      // User is liking the thread
+      originalThread.likes += 1;
+      user.likedThreads.push(threadId);
+    } else {
+      // User is unliking the thread
+      originalThread.likes -= 1;
+      user.likedThreads = user.likedThreads.filter(
+        (id: string) => id.toString() !== threadId
+      );
+    }
+
+    await user.save();
+    await originalThread.save();
+  } catch (err: any) {
+    console.log(err);
+    throw new Error("Unable to add like");
   }
 }

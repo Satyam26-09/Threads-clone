@@ -24,6 +24,7 @@ const PostThread = ({ userId }: { userId: string }) => {
   const pathname = usePathname();
   const router = useRouter();
   const { organization } = useOrganization();
+  const like = 0;
 
   const form = useForm<z.infer<typeof ThreadValidation>>({
     resolver: zodResolver(ThreadValidation),
@@ -39,6 +40,7 @@ const PostThread = ({ userId }: { userId: string }) => {
       author: userId,
       communityId: organization ? organization.id : null,
       path: pathname,
+      likes: like,
     });
 
     router.push("/");

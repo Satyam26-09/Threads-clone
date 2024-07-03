@@ -22,6 +22,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  likedThreads: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Thread",
+      default: [],
+    },
+  ],
 });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

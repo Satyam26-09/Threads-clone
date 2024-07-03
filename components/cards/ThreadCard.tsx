@@ -3,8 +3,9 @@
 import { formatDateString } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SharePopup from "../shared/SharePopup";
+import { updateLike } from "@/lib/actions/thread.action";
 
 interface Props {
   id: string;
@@ -26,6 +27,8 @@ interface Props {
     image: string;
   }[];
   isComment?: boolean;
+  likes: number;
+  hasLiked: boolean;
 }
 
 const ThreadCard = ({
@@ -38,15 +41,32 @@ const ThreadCard = ({
   createdAt,
   comments,
   isComment,
+  likes,
+  hasLiked,
 }: Props) => {
-  const [likes, setLikes] = useState(0);
+  const [like, setLike] = useState(likes);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const [isLikeClicked, setIsLikeClicked] = useState(hasLiked);
 
   const handleShareClick = () => {
     setIsPopupOpen((prev) => !prev);
   };
 
-  const threadLink = `http://localhost:3000/thread/${id}`;
+  const handleLikeClick = async () => {
+    try {
+      const updatedLikes = isLikeClicked ? like - 1 : like + 1;
+      setLike(updatedLikes);
+      setIsLikeClicked((prev) => !prev);
+      await updateLike(id, currentUserId);
+    } catch (error) {
+      console.error("Failed to update like", error);
+      setLike((prev) => (isLikeClicked ? prev + 1 : prev - 1));
+      setIsLikeClicked((prev) => !prev);
+    }
+  };
+
+  const threadLink = `http://localhost:3000/thread/${id}`; //to be updated
 
   return (
     <article
@@ -81,16 +101,25 @@ const ThreadCard = ({
                 isComment && "mb-10"
               } mt-5 flex flex-col gap-3 mb-0`}
             >
-              <div className="flex gap-3 relative">
-                <Image
-                  src="/assets/heart-gray.svg"
-                  alt="heart"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer object-contain"
-                  onClick={() => setLikes(likes + 1)}
-                />
-                <Link href={`/thread/${id}`}>
+              <div className="flex gap-3">
+                <button className="flex items-center" onClick={handleLikeClick}>
+                  <Image
+                    src={
+                      !isLikeClicked
+                        ? "/assets/heart-gray.svg"
+                        : "/assets/heart-filled.svg"
+                    }
+                    alt="heart"
+                    width={24}
+                    height={24}
+                    className="cursor-pointer object-contain"
+                  />
+                  <p className="text-subtle-medium text-gray-1 min-w-8 text-left">
+                    {like}
+                  </p>
+                </button>
+
+                <Link href={`/thread/${id}`} className="flex items-center">
                   <Image
                     src="/assets/reply.svg"
                     alt="reply"
@@ -98,29 +127,48 @@ const ThreadCard = ({
                     height={24}
                     className="cursor-pointer object-contain"
                   />
+                  <p className="text-subtle-medium text-gray-1 min-w-8 text-left">
+                    222
+                  </p>
                 </Link>
-                <Image
-                  src="/assets/repost.svg"
-                  alt="repost"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer object-contain"
-                />
-                <button onClick={handleShareClick}>
+                <button className="flex items-center">
                   <Image
-                    src="/assets/share.svg"
-                    alt="share"
+                    src="/assets/repost.svg"
+                    alt="repost"
                     width={24}
                     height={24}
                     className="cursor-pointer object-contain"
                   />
+                  <p className="text-subtle-medium text-gray-1 min-w-8 text-left">
+                    333
+                  </p>
                 </button>
-                {isPopupOpen && (
-                  <SharePopup
-                    threadLink={threadLink}
-                    onClose={handleShareClick}
-                  />
-                )}
+
+                <div className="popup-container">
+                  <button
+                    onClick={handleShareClick}
+                    className="flex items-center"
+                  >
+                    <Image
+                      src="/assets/share.svg"
+                      alt="share"
+                      width={24}
+                      height={24}
+                      className="cursor-pointer object-contain"
+                    />
+                    <p className="text-subtle-medium text-gray-1 min-w-8 text-left">
+                      444
+                    </p>
+                  </button>
+                  {isPopupOpen && (
+                    <div className="popup">
+                      <SharePopup
+                        threadLink={threadLink}
+                        onClose={handleShareClick}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               {isComment && comments.length > 0 && (
                 <Link href={`thread/${id}`}>

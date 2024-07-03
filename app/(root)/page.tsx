@@ -1,6 +1,7 @@
 import ThreadCard from "@/components/cards/ThreadCard";
 import { fetchThreads } from "@/lib/actions/thread.action";
 import { currentUser } from "@clerk/nextjs/server";
+import { fetchUser } from "@/lib/actions/user.actions";
 
 export default async function Home() {
   const result = await fetchThreads(1, 30);
@@ -9,29 +10,41 @@ export default async function Home() {
   const user = await currentUser();
   // console.log("Current user:", user);
 
+  let userInfo = null;
+  if (user) {
+    userInfo = await fetchUser(user.id);
+  }
+
   // Ensure the data passed to ThreadCard is serializable(in precise the error occured in 'comments' refers to ThreadsTab.tsx)
-  const serializedPosts = result.posts.map((post) => ({
-    id: post._id.toString(),
-    currentUserId: user?.id || "",
-    parentId: post.parentId ? post.parentId.toString() : null,
-    content: post.text,
-    author: {
-      name: post.author.name,
-      image: post.author.image,
-      id: post.author.id.toString(),
-    },
-    community: post.community
-      ? {
-          name: post.community.name,
-          image: post.community.image,
-          id: post.community.id.toString(),
-        }
-      : null,
-    createdAt: post.createdAt.toString(),
-    comments: post.children.map((comment: { image: string }) => ({
-      image: comment.image,
-    })),
-  }));
+  const serializedPosts = result.posts.map((post) => {
+    const hasLiked = userInfo?.likedThreads?.includes(post._id);
+    return {
+      id: post._id.toString(),
+      currentUserId: user?.id || "",
+      parentId: post.parentId ? post.parentId.toString() : null,
+      content: post.text,
+      author: {
+        name: post.author.name,
+        image: post.author.image,
+        id: post.author.id.toString(),
+      },
+      community: post.community
+        ? {
+            name: post.community.name,
+            image: post.community.image,
+            id: post.community.id.toString(),
+          }
+        : null,
+      createdAt: post.createdAt.toString(),
+      comments: post.children.map((comment: { image: string }) => ({
+        image: comment.image,
+      })),
+      likes: post.likes,
+      hasLiked: hasLiked || false,
+    };
+  });
+
+  // console.log(result.posts[0]);
 
   return (
     <>
