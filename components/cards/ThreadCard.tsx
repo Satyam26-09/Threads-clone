@@ -6,6 +6,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import SharePopup from "../shared/SharePopup";
 import { updateLike } from "@/lib/actions/thread.action";
+import DeleteThread from "../forms/DeleteThread";
 
 interface Props {
   id: string;
@@ -178,6 +179,13 @@ const ThreadCard = ({
             </div>
           </div>
         </div>
+        <DeleteThread
+          threadId={JSON.stringify(id)}
+          currentUserId={currentUserId}
+          authorId={author.id}
+          parentId={parentId}
+          isComment={isComment}
+        />
       </div>
       {!isComment && comments.length > 0 && (
         <div className="ml-1 mt-3 flex items-center gap-2">
