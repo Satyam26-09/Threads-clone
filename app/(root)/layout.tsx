@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import BottomBar from "@/components/shared/BottomBar";
-import { RightSidebar } from "@/components/shared/RightSidebar";
+import RightSidebar from "@/components/shared/RightSidebar";
 import LeftSidebar from "@/components/shared/LeftSidebar";
 import Topbar from "@/components/shared/Topbar";
 import { dark } from "@clerk/themes";
