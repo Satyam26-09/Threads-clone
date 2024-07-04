@@ -2,6 +2,7 @@ import ThreadCard from "@/components/cards/ThreadCard";
 import { fetchThreads } from "@/lib/actions/thread.action";
 import { currentUser } from "@clerk/nextjs/server";
 import { fetchUser } from "@/lib/actions/user.actions";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const result = await fetchThreads(1, 30);
@@ -13,6 +14,7 @@ export default async function Home() {
   let userInfo = null;
   if (user) {
     userInfo = await fetchUser(user.id);
+    if (!userInfo?.onboarded) redirect("/onboarding");
   }
 
   // Ensure the data passed to ThreadCard is serializable(in precise the error occured in 'comments' refers to ThreadsTab.tsx)

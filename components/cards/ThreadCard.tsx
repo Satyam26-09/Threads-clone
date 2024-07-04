@@ -96,11 +96,7 @@ const ThreadCard = ({
             <p className="mt-2 px-2 text-small-regular text-light-2">
               {content}
             </p>
-            <div
-              className={`${
-                isComment && "mb-10"
-              } mt-5 flex flex-col gap-3 mb-0`}
-            >
+            <div className="mt-5 flex flex-col gap-3 mb-0">
               <div className="flex gap-3">
                 <button className="flex items-center" onClick={handleLikeClick}>
                   <Image
@@ -183,7 +179,7 @@ const ThreadCard = ({
         {/* delete thread */}
         {/* show comment logos */}
       </div>
-      <div className=" flex items-center">
+      <div className={` flex items-center ${isComment && "mb-5"} `}>
         <span className="p-3 text-subtle-medium text-gray-1">
           {formatDateString(createdAt)}
         </span>
