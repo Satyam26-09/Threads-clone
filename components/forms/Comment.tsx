@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { usePathname, useRouter } from "next/navigation";
-import { addCommentToThread, createThread } from "@/lib/actions/thread.action";
+import { addCommentToThread } from "@/lib/actions/thread.action";
 import Image from "next/image";
 
 interface Props {
