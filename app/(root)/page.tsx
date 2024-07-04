@@ -38,8 +38,10 @@ export default async function Home() {
           }
         : null,
       createdAt: post.createdAt.toString(),
-      comments: post.children.map((comment: { image: string }) => ({
-        image: comment.image,
+      comments: post.children.map((comment: { author: { image: string } }) => ({
+        author: comment.author
+          ? { image: comment.author.image }
+          : { image: "/assets/profile.svg" },
       })),
       likes: post.likes,
       hasLiked: hasLiked || false,
